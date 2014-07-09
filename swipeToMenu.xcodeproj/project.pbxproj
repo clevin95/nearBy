@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6F1447AA196C813C00E67E60 /* CELProfilePictureView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F1447A9196C813C00E67E60 /* CELProfilePictureView.m */; };
 		6F2850491966F50F00356705 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F2850481966F50F00356705 /* MapKit.framework */; };
 		6F28504C1967031100356705 /* CELMenuView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F28504B1967031100356705 /* CELMenuView.m */; };
 		6F4D35E2196621A300984141 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F4D35E1196621A300984141 /* Foundation.framework */; };
@@ -39,6 +40,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		6F1447A8196C813C00E67E60 /* CELProfilePictureView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CELProfilePictureView.h; sourceTree = "<group>"; };
+		6F1447A9196C813C00E67E60 /* CELProfilePictureView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CELProfilePictureView.m; sourceTree = "<group>"; };
 		6F2850481966F50F00356705 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		6F28504A1967031100356705 /* CELMenuView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CELMenuView.h; sourceTree = "<group>"; };
 		6F28504B1967031100356705 /* CELMenuView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CELMenuView.m; sourceTree = "<group>"; };
@@ -136,9 +139,11 @@
 				6F4D35F1196621A300984141 /* CELAppDelegate.m */,
 				6F4D361B196623CF00984141 /* CELSwipeMenuViewController.h */,
 				6F4D361C196623CF00984141 /* CELSwipeMenuViewController.m */,
+				6F4D35F3196621A300984141 /* Main.storyboard */,
+				6F1447A8196C813C00E67E60 /* CELProfilePictureView.h */,
+				6F1447A9196C813C00E67E60 /* CELProfilePictureView.m */,
 				6F28504A1967031100356705 /* CELMenuView.h */,
 				6F28504B1967031100356705 /* CELMenuView.m */,
-				6F4D35F3196621A300984141 /* Main.storyboard */,
 				6F4D35F9196621A300984141 /* Images.xcassets */,
 				6F4D35E8196621A300984141 /* Supporting Files */,
 			);
@@ -317,6 +322,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6F28504C1967031100356705 /* CELMenuView.m in Sources */,
+				6F1447AA196C813C00E67E60 /* CELProfilePictureView.m in Sources */,
 				6F4D35EE196621A300984141 /* main.m in Sources */,
 				6F4D35F2196621A300984141 /* CELAppDelegate.m in Sources */,
 				6F4D361E196623CF00984141 /* CELSwipeMenuViewController.m in Sources */,
