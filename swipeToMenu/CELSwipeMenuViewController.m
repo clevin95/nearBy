@@ -6,33 +6,35 @@
 //  Copyright (c) 2014 Carter Levin. All rights reserved.
 //
 
-#import "CELSwipeMenuViewController.h"
-#import "CELMenuView.h"
-#import <MapKit/MapKit.h>
-#import <KNSemiModalViewController/UIViewController+KNSemiModal.h>
 #import <CoreLocation/CoreLocation.h>
 #import <AVFoundation/AVFoundation.h>
+#import <MapKit/MapKit.h>
+#import <KNSemiModalViewController/UIViewController+KNSemiModal.h>
+
+#import "CELSwipeMenuViewController.h"
+#import "CELMenuView.h"
+#import "CELMakePostViewController.h"
+#import "CELMenuProtocal.h"
+#import "CELMakePostProtocal.h"
+#import "CELMakePostViewController.h"
+#import "CELSearchBarView.h"
+#import "CELPostMapAnotation.h"
+#import "CELFetchUpdates.h"
+#import "Post.h"
+#import "CELPostAnnotationView.h"
 
 
-@interface CELSwipeMenuViewController () <CLLocationManagerDelegate, UISearchBarDelegate, UIImagePickerControllerDelegate>
+@interface CELSwipeMenuViewController () <CLLocationManagerDelegate, UISearchBarDelegate, CELMakePostProtocal, CELFetchUpdatesProtocal, MKMapViewDelegate>
 
 
 @property (weak, nonatomic) IBOutlet MKMapView *worldMap;
-
-@property (weak, nonatomic) IBOutlet UIView *menuView;
-@property (weak, nonatomic) IBOutlet UIImageView *userImage;
-@property (weak, nonatomic) IBOutlet UISegmentedControl *filterByPosterSelector;
-
-@property (weak, nonatomic) IBOutlet UITextView *postTextView;
-@property (weak, nonatomic) IBOutlet UIButton *postPostButton;
-@property (weak, nonatomic) IBOutlet UIButton *cancelPostButton;
-@property (weak, nonatomic) IBOutlet UISegmentedControl *postTypeSelector;
-@property (weak, nonatomic) IBOutlet UIButton *postTransitionButton;
-
+@property (weak, nonatomic) IBOutlet CELMenuView *menuView;
+@property (weak, nonatomic) IBOutlet UIView *makePostControllerContainer;
 @property (weak, nonatomic) IBOutlet UISearchBar *searchAndFilterBar;
-@property (weak, nonatomic) IBOutlet UIView *searchBarAndCancelButtonView;
+@property (weak, nonatomic) IBOutlet CELSearchBarView *searchBarAndCancelButtonView;
 @property (weak, nonatomic) IBOutlet UIView *travelPieChart;
-@property (weak, nonatomic) IBOutlet UIView *postScreenView;
+@property (weak, nonatomic) IBOutlet UIButton *cancelSearchButton;
+
 
 @property (strong, nonatomic) UIDynamicAnimator *animator;
 @property (strong, nonatomic) UICollisionBehavior *topBoundry;
@@ -43,8 +45,9 @@
 @property (strong, nonatomic) CLLocationManager *locationManager;
 @property (strong, nonatomic) CLLocation *currentLocation;
 @property (nonatomic) MKCoordinateRegion previousViewRegion;
-
 @property (strong, nonatomic) UIView *inputAccessoryView;
+@property (nonatomic, weak) CELMakePostViewController *makePostViewController;
+
 
 //Sets bounds for dissmissing and reentering menu
 @property (nonatomic) CGPoint previousMenuPosition;
@@ -56,13 +59,18 @@
 
 //constraints which change for animation
 @property (strong, nonatomic) NSLayoutConstraint *searchViewBottom;
+@property (strong, nonatomic) NSLayoutConstraint *searchBarRight;
+@property (strong, nonatomic) NSLayoutConstraint *postScreenHeight;
+@property (strong, nonatomic) NSLayoutConstraint *postScreenWidth;
+@property (strong, nonatomic) NSLayoutConstraint *postScreenY;
+@property (strong, nonatomic) NSArray *searchViewHorizontal;
+@property (strong, nonatomic) NSDictionary *views;
 
-@property (strong, nonatomic) UIImagePickerController *imagePickerController;
+@property (strong, nonatomic) CELFetchUpdates *postFetcher;
 
-- (IBAction)makePost:(id)sender;
-- (IBAction)cancelPost:(id)sender;
-- (IBAction)postPost:(id)sender;
-- (IBAction)postTypeSelected:(id)sender;
+- (IBAction)transtitionToMakePost:(id)sender;
+- (IBAction)cancelSearchTapped:(id)sender;
+
 
 @end
 
@@ -81,224 +89,98 @@
 {
     [super viewDidLoad];
     self.searchAndFilterBar.delegate = self;
+    self.postFetcher = [[CELFetchUpdates alloc] initForEntityNamed:@"Post"];
+    self.postFetcher.delegate = self;
+    self.worldMap.delegate = self;
     [self setUpMap];
+    [self setUpMakePostView];
     [self setUpMenu];
+    [self setUpSearchView];
     [self setUpConstraints];
+}
+
+-(void)fetchedNewObject:(id)object
+{
+    Post *newPost = (Post *)object;
+    [self makeAnotationFromPost:newPost];
+}
+
+
+- (void)makeAnotationFromPost:(Post *)post
+{
+    CELPostMapAnotation *newAnotation = [[CELPostMapAnotation alloc] initWithPost:post];
+    [newAnotation annotationView];
+    [self.worldMap addAnnotation:newAnotation];
+}
+
+
+
+
+- (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id <MKAnnotation>)annotation {
     
-    
-    
-    
-    self.imagePickerController = [[UIImagePickerController alloc]init];
-    if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]){
-        self.imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
-        //self.imagePickerController.mediaTypes = @[kUTTypeImage];
+    if ([annotation isKindOfClass:[CELPostMapAnotation class]]) {
+        CELPostMapAnotation *postAnnototion = (CELPostMapAnotation *)annotation;
+        MKAnnotationView *annotationView  = [mapView dequeueReusableAnnotationViewWithIdentifier:@"CELPostMapAnotation"];
+        if (annotationView == nil){
+            annotationView = postAnnototion.annotationView;
+            UIImage *annotationImage = [UIImage imageNamed:@"defaultImage.jpg"];
+            annotationView.image = annotationImage;
+            annotationView.frame = CGRectMake(0, 0, 30, 30);
+            annotationView.layer.borderWidth = 2;
+            annotationView.layer.cornerRadius = 15;
+        }else {
+            annotationView.annotation = annotation;
+        }
+        return annotationView;
+    }else{
+        return nil;
     }
-    
 }
 
-- (void)setUpConstraints
+-(void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view
 {
-    [self.view removeConstraints:self.view.constraints];
-    [self.menuView removeConstraints:self.menuView.constraints];
-    [self.postScreenView removeConstraints:self.postScreenView.constraints];
-    [self.searchBarAndCancelButtonView removeConstraints:self.searchBarAndCancelButtonView.constraints];
-    self.postScreenView.translatesAutoresizingMaskIntoConstraints = NO;
-    self.menuView.translatesAutoresizingMaskIntoConstraints = NO;
-    self.searchBarAndCancelButtonView.translatesAutoresizingMaskIntoConstraints = NO;
-    NSLayoutConstraint *menuViewHeightConstraint = [NSLayoutConstraint constraintWithItem:self.menuView
-                                                                                attribute:NSLayoutAttributeHeight
-                                                                                relatedBy:NSLayoutRelationEqual
-                                                                                   toItem:self.view
-                                                                                attribute:NSLayoutAttributeHeight
-                                                                               multiplier:1
-                                                                                 constant:0];
-    NSLayoutConstraint *menuViewWidthConstraint = [NSLayoutConstraint constraintWithItem:self.menuView
-                                                                               attribute:NSLayoutAttributeWidth
-                                                                               relatedBy:NSLayoutRelationEqual
-                                                                                  toItem:self.view
-                                                                               attribute:NSLayoutAttributeWidth
-                                                                              multiplier:1
-                                                                                constant:0];
-    
-    NSLayoutConstraint *menuViewCenterConstraint = [NSLayoutConstraint constraintWithItem:self.menuView
-                                                                                attribute:NSLayoutAttributeCenterX
-                                                                                relatedBy:NSLayoutRelationEqual
-                                                                                   toItem:self.view
-                                                                                attribute:NSLayoutAttributeCenterX
-                                                                               multiplier:1
-                                                                                 constant:0];
-    NSLayoutConstraint *menuViewBottomConstraint = [NSLayoutConstraint constraintWithItem:self.menuView
-                                                                                attribute:NSLayoutAttributeBottom
-                                                                                relatedBy:NSLayoutRelationEqual
-                                                                                   toItem:self.view
-                                                                                attribute:NSLayoutAttributeTop
-                                                                               multiplier:1
-                                                                                 constant:self.menuTabLength];
-    [self.view addConstraints:@[menuViewHeightConstraint, menuViewWidthConstraint, menuViewCenterConstraint, menuViewBottomConstraint]];
-    
-    
-    
-    NSLayoutConstraint *mapTop = [NSLayoutConstraint constraintWithItem:self.worldMap
-                                                              attribute:NSLayoutAttributeTop
-                                                              relatedBy:NSLayoutRelationEqual
-                                                                 toItem:self.view
-                                                              attribute:NSLayoutAttributeTop
-                                                             multiplier:1
-                                                               constant:1];
-    NSLayoutConstraint *mapBottom = [NSLayoutConstraint constraintWithItem:self.worldMap
-                                                                 attribute:NSLayoutAttributeBottom
-                                                                 relatedBy:NSLayoutRelationEqual
-                                                                    toItem:self.view
-                                                                 attribute:NSLayoutAttributeBottom
-                                                                multiplier:1
-                                                                  constant:0];
-    NSLayoutConstraint *mapLeft = [NSLayoutConstraint constraintWithItem:self.worldMap attribute:NSLayoutAttributeLeft
-                                                               relatedBy:NSLayoutRelationEqual
-                                                                  toItem:self.view
-                                                               attribute:NSLayoutAttributeLeft
-                                                              multiplier:1
-                                                                constant:0];
-    NSLayoutConstraint *mapRight = [NSLayoutConstraint constraintWithItem:self.worldMap
-                                                                attribute:NSLayoutAttributeRight
-                                                                relatedBy:NSLayoutRelationEqual
-                                                                   toItem:self.view
-                                                                attribute:NSLayoutAttributeRight
-                                                               multiplier:1
-                                                                 constant:0];
-    
-    [self.view addConstraints:@[ mapRight, mapLeft, mapBottom, mapTop]];
-    
-    NSLayoutConstraint *searchViewCenter = [NSLayoutConstraint constraintWithItem:self.searchBarAndCancelButtonView
-                                                                        attribute:NSLayoutAttributeCenterX
-                                                                        relatedBy:NSLayoutRelationEqual
-                                                                           toItem:self.view
-                                                                        attribute:NSLayoutAttributeCenterX
-                                                                       multiplier:1 constant:0];
-    NSLayoutConstraint *searchViewWidth = [NSLayoutConstraint constraintWithItem:self.searchBarAndCancelButtonView
-                                                                       attribute:NSLayoutAttributeWidth
-                                                                       relatedBy:NSLayoutRelationEqual
-                                                                          toItem:self.view
-                                                                       attribute:NSLayoutAttributeWidth
-                                                                      multiplier:1
-                                                                        constant:0];
-    NSLayoutConstraint *searchViewHeight = [NSLayoutConstraint constraintWithItem:self.searchBarAndCancelButtonView
-                                                                        attribute:NSLayoutAttributeHeight
-                                                                        relatedBy:NSLayoutRelationEqual
-                                                                           toItem:self.view
-                                                                        attribute:NSLayoutAttributeHeight
-                                                                       multiplier:0.1
-                                                                         constant:0];
-    self.searchViewBottom = [NSLayoutConstraint constraintWithItem:self.searchBarAndCancelButtonView
-                                                         attribute:NSLayoutAttributeBottom
-                                                         relatedBy:NSLayoutRelationEqual
-                                                            toItem:self.view
-                                                         attribute:NSLayoutAttributeBottom
-                                                        multiplier:1
-                                                          constant:0];
-    [self.view addConstraints:@[searchViewCenter, searchViewWidth, self.searchViewBottom, searchViewHeight]];
-    //Constraints for post view
-    NSLayoutConstraint *postScreenTop = [NSLayoutConstraint constraintWithItem:self.postScreenView
-                                                                     attribute:NSLayoutAttributeTop
-                                                                     relatedBy:NSLayoutRelationEqual
-                                                                        toItem:self.view
-                                                                     attribute:NSLayoutAttributeTop
-                                                                    multiplier:1
-                                                                      constant:20];
-
-    NSLayoutConstraint *postScreenHeight = [NSLayoutConstraint constraintWithItem:self.postScreenView
-                                                                        attribute:NSLayoutAttributeHeight
-                                                                        relatedBy:NSLayoutRelationEqual
-                                                                           toItem:self.view
-                                                                        attribute:NSLayoutAttributeHeight
-                                                                       multiplier:0.3
-                                                                         constant:0];
-    NSLayoutConstraint *postScreenLeft = [NSLayoutConstraint constraintWithItem:self.postScreenView
-                                                                      attribute:NSLayoutAttributeLeft
-                                                                      relatedBy:NSLayoutRelationEqual
-                                                                         toItem:self.view
-                                                                      attribute:NSLayoutAttributeLeft
-                                                                     multiplier:1
-                                                                       constant:5];
-    NSLayoutConstraint *postScreenRight = [NSLayoutConstraint constraintWithItem:self.postScreenView
-                                                                       attribute:NSLayoutAttributeRight
-                                                                       relatedBy:NSLayoutRelationEqual
-                                                                          toItem:self.view
-                                                                       attribute:NSLayoutAttributeRight
-                                                                      multiplier:1
-                                                                        constant:-5];
-    
-    [self.view addConstraints:@[postScreenHeight,postScreenLeft,postScreenTop, postScreenRight]];
-    [self setUpMenuConstraints];
-    [self setUpPostViewContraints];
+    if ([view.annotation isKindOfClass:[CELPostMapAnotation class]]) {
+        CELPostMapAnotation *postAnotation = view.annotation;
+        Post *selectedPost = postAnotation.post;
+        CGRect postViewRect = CGRectMake(0, 0, 300, 100);
+        UIView *viewPostView = [[UIView alloc]initWithFrame:postViewRect];
+        viewPostView.layer.backgroundColor = [UIColor whiteColor].CGColor;
+        viewPostView.alpha = 0.5;
+        UITextView *postText = [[UITextView alloc]initWithFrame:viewPostView.frame];
+        postText.text = selectedPost.text;
+        postText.editable = NO;
+        postText.textColor = [UIColor whiteColor];
+        [viewPostView addSubview:postText];
+        [self presentSemiView:viewPostView];
+    }
 }
 
 
-- (void)setUpPostViewContraints
+
+
+
+
+
+-(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
-    [self.cancelPostButton removeConstraints:self.cancelPostButton.constraints];
-    [self.postPostButton removeConstraints:self.postPostButton.constraints];
-    [self.postTextView removeConstraints:self.postTextView.constraints];
-    
-    NSDictionary *views = NSDictionaryOfVariableBindings(_cancelPostButton, _postPostButton, _postTypeSelector, _postTextView);
-    NSArray *horizontalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[_cancelPostButton(50)]-(5)-[_postTypeSelector]-(5)-[_postPostButton(==_cancelPostButton)]|" options:0 metrics:nil views:views];
-    NSArray *verticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_postTypeSelector]-[_postTextView]|" options:0 metrics:nil views:views];
-    NSArray *textViewWidth = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(30)-[_postTextView]-(30)-|" options:0 metrics:nil views:views];
-    NSLayoutConstraint *cancelButtonY = [NSLayoutConstraint constraintWithItem:self.cancelPostButton
-                                                                     attribute:NSLayoutAttributeCenterY
-                                                                     relatedBy:NSLayoutRelationEqual
-                                                                        toItem:self.postTypeSelector
-                                                                     attribute:NSLayoutAttributeCenterY
-                                                                    multiplier:1
-                                                                      constant:0];
-    NSLayoutConstraint *postButtonY = [NSLayoutConstraint constraintWithItem:self.postPostButton
-                                                                   attribute:NSLayoutAttributeCenterY
-                                                                   relatedBy:NSLayoutRelationEqual
-                                                                      toItem:self.postTypeSelector
-                                                                   attribute:NSLayoutAttributeCenterY
-                                                                  multiplier:1
-                                                                    constant:0];
-    
-    
-    
-    [self.view addConstraints:horizontalConstraints];
-    [self.view addConstraints:@[cancelButtonY,postButtonY]];
-    [self.view addConstraints:verticalConstraints];
-    [self.view addConstraints:textViewWidth];
+    self.makePostViewController = segue.destinationViewController;
+    self.makePostViewController.delegate = self;
 }
 
-
-- (void)setUpMenuConstraints
+- (void)setUpSearchView
 {
-    [self.userImage removeConstraints:self.userImage.constraints];
-    [self.filterByPosterSelector removeConstraints:self.filterByPosterSelector.constraints];
-    [self.postPostButton removeConstraints:self.postPostButton.constraints];
-    self.userImage.translatesAutoresizingMaskIntoConstraints = NO;
-    NSDictionary *views = NSDictionaryOfVariableBindings(_userImage, _filterByPosterSelector, _postTransitionButton);
-    
-    NSArray *menuTabHorizontalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"|-(3)-[_userImage(45)]-(>=2)-[_filterByPosterSelector(220)]-(>=2)-[_postTransitionButton]-(3)-|" options:0 metrics:nil views:views];
-    
-    NSArray *menuTabLeftVerticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"[_userImage]|" options:0 metrics:nil views:views];
-    
-    [self.menuView addConstraints:menuTabHorizontalConstraints];
-    [self.menuView addConstraints:menuTabLeftVerticalConstraints];
+    self.cancelSearchButton.alpha = 0;
+}
 
-    NSLayoutConstraint *centerSelectorConstraint = [NSLayoutConstraint constraintWithItem:self.filterByPosterSelector
-                                                                                attribute:NSLayoutAttributeCenterX
-                                                                                relatedBy:NSLayoutRelationEqual
-                                                                                   toItem:self.menuView
-                                                                                attribute:NSLayoutAttributeCenterX
-                                                                               multiplier:1
-                                                                                 constant:0];
-    NSLayoutConstraint *userImageViewHeightConstraint = [NSLayoutConstraint constraintWithItem:self.userImage
-                                                                                     attribute:NSLayoutAttributeHeight
-                                                                                     relatedBy:NSLayoutRelationEqual
-                                                                                        toItem:self.userImage
-                                                                                     attribute:NSLayoutAttributeWidth
-                                                                                    multiplier:1
-                                                                                      constant:0];
-    
-    [self.menuView addConstraints:@[/*userImageViewWidthConstraint,*/ userImageViewHeightConstraint, centerSelectorConstraint]];
-    
+- (void)setUpMakePostView
+{
+    self.makePostControllerContainer.hidden = NO;
+    self.makePostControllerContainer.alpha = 0;
+    self.makePostControllerContainer.layer.cornerRadius = 10;
+    self.makePostControllerContainer.layer.borderWidth = 3;
+    UIColor *pinkBorderColor = [UIColor colorWithRed:(217.0/255.0) green:(143/255.0) blue:(137/255.0) alpha:0.5];
+    self.makePostControllerContainer.layer.borderColor = pinkBorderColor.CGColor;
+    self.makePostControllerContainer.clipsToBounds = YES;
 }
 
 - (void)setUpMap
@@ -317,7 +199,7 @@
     self.menuView.layer.shadowColor = [UIColor blackColor].CGColor;
     self.menuView.layer.shadowOpacity = .9f;
     
-    self.menuTabLength = 60;
+    self.menuTabLength = 70;
     self.bottomLeft = CGPointMake(0, self.view.frame.size.height);
     self.bottomRight = CGPointMake(self.view.frame.size.width, self.view.frame.size.height);
     self.topLeft = CGPointMake(0, -self.view.frame.size.height + self.menuTabLength);
@@ -330,17 +212,6 @@
     
     self.topBoundry = [[UICollisionBehavior alloc] initWithItems:@[self.menuView]];
     self.bottomBoundry = [[UICollisionBehavior alloc] initWithItems:@[self.menuView]];
-    self.userImage.image = [UIImage imageNamed:@"defaultImage.jpg"];
-    self.userImage.layer.cornerRadius = self.userImage.frame.size.width/2;
-    self.userImage.clipsToBounds = YES;
-}
-
-- (void)viewWillAppear:(BOOL)animated
-{
-    [super viewWillAppear:animated];
-    self.menuView.frame = CGRectOffset(self.view.frame, 0, 0);
-    
-    //self.postTextView.hidden = YES;
 }
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
@@ -356,12 +227,7 @@
     self.currentLocation = locations[0];
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
+//Deals with the panning of the menuView
 
 - (void) updateMenuAndSearchAlpha
 {
@@ -394,7 +260,7 @@
         [velocityBehavior addLinearVelocity:velocity forItem:self.menuView];
         [self.animator addBehavior:velocityBehavior];
         if (velocity.y > 0 ){
-            [self fadeOutViews:@[self.searchBarAndCancelButtonView]];
+            [self fadeOutViews:@[self.searchBarAndCancelButtonView] withSpeed:0.5];
         }else{
             [self fadeInViews:@[self.searchBarAndCancelButtonView]];
         }
@@ -421,13 +287,106 @@
     if (self.searchViewBottom.constant == 0)
     {
         multiplier = -1;
+        [self fadeInViews:@[self.cancelSearchButton]];
     }
-    self.searchViewBottom.constant += multiplier * (self.view.frame.size.height - 80);
+    self.searchViewBottom.constant += multiplier * (self.view.frame.size.height - 60);
     [UIView animateWithDuration:0.3 animations:^{
         [self.view layoutIfNeeded];
+        self.searchBarRight.constant += multiplier*50;
     }];
 }
 
+
+- (void)moveToPossition
+{
+    CGFloat currentLongitude = self.currentLocation.coordinate.longitude;
+    CGFloat currentLatitude = self.currentLocation.coordinate.latitude;
+    self.makePostViewController.latitude = currentLatitude;
+    self.makePostViewController.longitude = currentLongitude;
+    MKCoordinateSpan span = {.latitudeDelta =  0.002, .longitudeDelta =  0.002};
+    CLLocationCoordinate2D coordinate = {currentLatitude + 0.0004,currentLongitude};
+    MKCoordinateRegion region = {coordinate, span};
+    [self.worldMap setRegion:region animated:YES];
+}
+
+- (void)fadeInViews:(NSArray *)views
+{
+    for (UIView *view in views){
+        view.hidden = NO;
+    }
+    [UIView animateWithDuration:1 animations:^{
+        for (UIView *view in views){
+            view.alpha = 1;
+        }
+    }];
+}
+
+- (void)fadeOutViews:(NSArray *)views withSpeed:(CGFloat)speed
+{
+    [UIView animateWithDuration:speed animations:^{
+        for (UIView *view in views){
+            view.alpha = 0;
+        }
+    } completion:^(BOOL finished) {
+        for (UIView *view in views){
+            view.hidden = YES;
+        }
+    }];
+}
+
+-(void)makePostAnimation
+{
+    NSLayoutConstraint *oldHeight = self.postScreenHeight;
+    NSLayoutConstraint *oldWidth = self.postScreenWidth;
+    [self.view removeConstraints:@[oldHeight, oldWidth]];
+    self.postScreenHeight = [NSLayoutConstraint constraintWithItem:self.makePostControllerContainer
+                                                         attribute:NSLayoutAttributeHeight
+                                                         relatedBy:NSLayoutRelationEqual
+                                                            toItem:self.view
+                                                         attribute:NSLayoutAttributeHeight
+                                                        multiplier:0.11
+                                                          constant:0];
+    
+    self.postScreenWidth = [NSLayoutConstraint constraintWithItem:self.makePostControllerContainer
+                                                        attribute:NSLayoutAttributeWidth
+                                                        relatedBy:NSLayoutRelationEqual
+                                                           toItem:self.view
+                                                        attribute:NSLayoutAttributeWidth
+                                                       multiplier:0.16
+                                                         constant:0];
+    UIImageView *imageView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"defaultImage.jpg"]];
+    imageView.autoresizesSubviews = YES;
+    [UIView animateWithDuration:0.5 animations:^{
+        [self.view addConstraints:@[self.postScreenWidth, self.postScreenHeight]];
+        [self.view layoutIfNeeded];
+        
+        self.makePostControllerContainer.layer.cornerRadius = 25;
+        
+        imageView.frame = CGRectMake(0, 0, self.makePostControllerContainer.frame.size.width, self.makePostControllerContainer.frame.size.height);
+        [self.makePostControllerContainer addSubview:imageView];
+        [UIView transitionWithView:self.makePostControllerContainer duration:0.2
+                           options:UIViewAnimationOptionTransitionCrossDissolve
+                        animations:^ {
+                            [self.makePostControllerContainer addSubview:imageView];
+                        }
+                        completion:^(BOOL finished) {
+                            usleep(500000);
+                            self.makePostControllerContainer.hidden = YES;
+                            [self.view removeConstraints:@[self.postScreenHeight, self.postScreenWidth]];
+                            self.postScreenWidth =  oldWidth;
+                            self.postScreenHeight = oldHeight;
+                            [self.view addConstraints:@[oldWidth, oldHeight]];
+                            self.makePostControllerContainer.layer.cornerRadius = 10;
+                            imageView.image = nil;
+                            [self exitFromMakePost];
+                        }];
+    }];
+}
+
+
+
+
+//Handel search bar;
 
 -(void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar
 {
@@ -435,9 +394,61 @@
     [self dismissMenuView];
 }
 
+
+- (void)dismissMenuView
+{
+    [self.animator removeAllBehaviors];
+    [UIView animateWithDuration:1 animations:^{
+        self.menuView.frame = CGRectOffset(self.menuView.frame, 0, -self.view.frame.size.height);
+    }];
+}
+
+- (void)reenterMenuView
+{
+    UIPushBehavior *pushMenu = [[UIPushBehavior alloc]initWithItems:@[self.menuView] mode:UIPushBehaviorModeContinuous];
+    pushMenu.pushDirection = CGVectorMake(0, 1000);
+    
+    [self.animator addBehavior:pushMenu];
+    UICollisionBehavior *stopMenuReenter = [[UICollisionBehavior alloc]initWithItems:@[self.menuView]];
+    
+    
+    CGPoint topLeftMenu = CGPointMake(0, self.menuTabLength);
+    CGPoint topRightMenu = CGPointMake(self.view.frame.size.width, self.menuTabLength);
+    
+    [stopMenuReenter addBoundaryWithIdentifier:@"stopReenter"
+                                     fromPoint:topLeftMenu
+                                       toPoint:topRightMenu];
+    [self.animator addBehavior:stopMenuReenter];
+}
+
+- (IBAction)transtitionToMakePost:(id)sender {
+    [self.animator removeAllBehaviors];
+    [self dismissMenuView];
+    [self fadeOutViews:@[self.searchBarAndCancelButtonView] withSpeed:0.5];
+    self.previousViewRegion = self.worldMap.region;
+    [self moveToPossition];
+    self.worldMap.scrollEnabled = NO;
+    self.makePostControllerContainer.hidden = NO;
+    [self fadeInViews:@[self.makePostControllerContainer]];
+}
+
+-(void)exitFromMakePost
+{
+    [self reenterMenuView];
+    [self fadeInViews:@[self.searchBarAndCancelButtonView]];
+    self.worldMap.scrollEnabled = YES;
+    [self fadeInViews:@[self.searchAndFilterBar]];
+    [self.worldMap setRegion:self.previousViewRegion animated:YES];
+    [self fadeOutViews:@[self.makePostControllerContainer] withSpeed:0.5 ];
+}
+
+- (IBAction)cancelSearchTapped:(id)sender {
+    [self endSearchScreen];
+}
+
 -(void)searchBarSearchButtonClicked:(UISearchBar *)theSearchBar
 {
-    [theSearchBar resignFirstResponder];
+    
     CLGeocoder *geocoder = [[CLGeocoder alloc] init];
     [geocoder geocodeAddressString:theSearchBar.text completionHandler:^(NSArray *placemarks, NSError *error) {
         //Error checking
@@ -453,112 +464,213 @@
         [self.worldMap setRegion:region animated:YES];
     }];
     [self.animator removeAllBehaviors];
+    [self endSearchScreen];
+}
+
+- (void)endSearchScreen
+{
+    [self.searchAndFilterBar resignFirstResponder];
+    [self fadeOutViews:@[self.cancelSearchButton] withSpeed:0.5];
     [self reenterMenuView];
     [self animateSearchBar];
 }
 
-- (void)dismissMenuView
-{
-    [self.animator removeAllBehaviors];
-    [UIView animateWithDuration:1 animations:^{
-        self.menuView.frame = CGRectOffset(self.menuView.frame, 0, -self.view.frame.size.height);
-    }];
-}
-
-- (void)reenterMenuView
-{
-    UIPushBehavior *pushMenu = [[UIPushBehavior alloc]initWithItems:@[self.menuView] mode:UIPushBehaviorModeContinuous];
-    pushMenu.pushDirection = CGVectorMake(0, 150);
-    [self.animator addBehavior:pushMenu];
-    UICollisionBehavior *stopMenuReenter = [[UICollisionBehavior alloc]initWithItems:@[self.menuView]];
-    CGPoint topLeftMenu = CGPointMake(0, 115);
-    CGPoint topRightMenu = CGPointMake(self.view.frame.size.width, 115);
-    
-    [stopMenuReenter addBoundaryWithIdentifier:@"stopReenter"
-                                     fromPoint:topLeftMenu
-                                       toPoint:topRightMenu];
-    [self.animator addBehavior:stopMenuReenter];
-}
 
 
-- (void)moveToPossition
-{
-    MKCoordinateSpan span = {.latitudeDelta =  0.002, .longitudeDelta =  0.002};
-    CLLocationCoordinate2D coordinate = {self.currentLocation.coordinate.latitude + 0.0004,self.currentLocation.coordinate.longitude};
-    MKCoordinateRegion region = {coordinate, span};
-    [self.worldMap setRegion:region animated:YES];
-}
 
-- (void)fadeInViews:(NSArray *)views
+
+- (void)setUpConstraints
 {
-    [UIView animateWithDuration:1.5 animations:^{
-        for (UIView *view in views){
-            view.alpha = 1;
+    //[self.view removeConstraints:self.view.constraints];
+    self.view.translatesAutoresizingMaskIntoConstraints = NO;
+    for (UIView *subview in self.view.subviews){
+        if (subview != self.menuView){
+            [subview removeConstraints:subview.constraints];
+            subview.translatesAutoresizingMaskIntoConstraints = NO;
         }
-    }];
-}
-
-- (void)fadeOutViews:(NSArray *)views
-{
-    [UIView animateWithDuration:1 animations:^{
-        for (UIView *view in views){
-            view.alpha = 0;
-        }
-    }];
-}
-
-- (IBAction)makePost:(id)sender {
-    [self.animator removeAllBehaviors];
-    [self dismissMenuView];
-    self.previousViewRegion = self.worldMap.region;
-    [self moveToPossition];
-    self.worldMap.scrollEnabled = NO;
-    self.postPostButton.hidden = NO;
-    self.cancelPostButton.hidden = NO;
-    self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+    }
     
-    self.postTextView.hidden = NO;
-    self.postTextView.layer.cornerRadius = 5;
-    [self fadeInViews:@[self.postScreenView]];
-    [self fadeOutViews:@[self.searchAndFilterBar]];
-    self.postTextView.inputAccessoryView = nil;
-}
-
-//make and cancel post options
-
-- (IBAction)cancelPost:(id)sender {
-    [self.worldMap setRegion:self.previousViewRegion animated:YES];
-    [self.postTextView resignFirstResponder];
-    [self reenterMenuView];
-    self.worldMap.scrollEnabled = YES;
-    [self fadeInViews:@[self.searchAndFilterBar]];
-    [self fadeOutViews:@[self.postScreenView]];
-}
-
-- (IBAction)postPost:(id)sender {
-}
-
-- (IBAction)postTypeSelected:(id)sender {
-    UISegmentedControl *postTypeSegment = sender;
-    NSLog(@"%@",postTypeSegment);
-    [self presentViewController:self.imagePickerController animated:YES completion:nil];
+    self.views = NSDictionaryOfVariableBindings(_menuView,_worldMap,_searchAndFilterBar,_searchBarAndCancelButtonView, _cancelSearchButton);
+    
+    [self mapViewConstraints];
+    [self menuConstraints];
+    [self postViewConstraints];
+    [self searchViewConstraints];
+     
 }
 
 
-/*
- - (UIView *)inputAccessoryView {
- if (!_inputAccessoryView) {
- CGRect accessFrame = CGRectMake(0.0, 0.0, 768.0, 40.0);
- _inputAccessoryView = [[UIView alloc] initWithFrame:accessFrame];
- _inputAccessoryView.backgroundColor = [UIColor whiteColor];
- _inputAccessoryView.layer.borderColor = [UIColor blackColor].CGColor;
- UIButton *compButton = [UIButton buttonWithType:UIButtonTypeRoundedRect];
- compButton.frame = CGRectMake(313.0, 20.0, 158.0, 37.0);
- [compButton setTitle: @"Word Completions" forState:UIControlStateNormal];
- [compButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
- [_inputAccessoryView addSubview:compButton];
- }
- return _inputAccessoryView;
- }*/
+- (void)mapViewConstraints
+{
+    NSLayoutConstraint *mapTop = [NSLayoutConstraint constraintWithItem:self.worldMap
+                                                              attribute:NSLayoutAttributeTop
+                                                              relatedBy:NSLayoutRelationEqual
+                                                                 toItem:self.view
+                                                              attribute:NSLayoutAttributeTop
+                                                             multiplier:1
+                                                               constant:1];
+    NSLayoutConstraint *mapBottom = [NSLayoutConstraint constraintWithItem:self.worldMap
+                                                                 attribute:NSLayoutAttributeBottom
+                                                                 relatedBy:NSLayoutRelationEqual
+                                                                    toItem:self.view
+                                                                 attribute:NSLayoutAttributeBottom
+                                                                multiplier:1
+                                                                  constant:0];
+    NSLayoutConstraint *mapLeft = [NSLayoutConstraint constraintWithItem:self.worldMap attribute:NSLayoutAttributeLeft
+                                                               relatedBy:NSLayoutRelationEqual
+                                                                  toItem:self.view
+                                                               attribute:NSLayoutAttributeLeft
+                                                              multiplier:1
+                                                                constant:0];
+    NSLayoutConstraint *mapRight = [NSLayoutConstraint constraintWithItem:self.worldMap
+                                                                attribute:NSLayoutAttributeRight
+                                                                relatedBy:NSLayoutRelationEqual
+                                                                   toItem:self.view
+                                                                attribute:NSLayoutAttributeRight
+                                                               multiplier:1
+                                                                 constant:0];
+    [self.view addConstraints:@[mapRight, mapLeft, mapBottom, mapTop]];
+}
+
+- (void)searchViewConstraints
+{
+    NSLayoutConstraint *searchViewCenter = [NSLayoutConstraint constraintWithItem:self.searchBarAndCancelButtonView
+                                                                        attribute:NSLayoutAttributeCenterX
+                                                                        relatedBy:NSLayoutRelationEqual
+                                                                           toItem:self.view
+                                                                        attribute:NSLayoutAttributeCenterX
+                                                                       multiplier:1
+                                                                         constant:0];
+    NSLayoutConstraint *searchViewWidth = [NSLayoutConstraint constraintWithItem:self.searchBarAndCancelButtonView
+                                                                       attribute:NSLayoutAttributeWidth
+                                                                       relatedBy:NSLayoutRelationEqual
+                                                                          toItem:self.view
+                                                                       attribute:NSLayoutAttributeWidth
+                                                                      multiplier:1
+                                                                        constant:0];
+    NSLayoutConstraint *searchViewHeight = [NSLayoutConstraint constraintWithItem:self.searchBarAndCancelButtonView
+                                                                        attribute:NSLayoutAttributeHeight
+                                                                        relatedBy:NSLayoutRelationEqual
+                                                                           toItem:self.searchAndFilterBar
+                                                                        attribute:NSLayoutAttributeHeight
+                                                                       multiplier:1.1
+                                                                         constant:0];
+    self.searchViewBottom = [NSLayoutConstraint constraintWithItem:self.searchBarAndCancelButtonView
+                                                         attribute:NSLayoutAttributeBottom
+                                                         relatedBy:NSLayoutRelationEqual
+                                                            toItem:self.view
+                                                         attribute:NSLayoutAttributeBottom
+                                                        multiplier:1
+                                                          constant:0];
+    [self.view addConstraints:@[searchViewCenter, searchViewWidth, self.searchViewBottom, searchViewHeight]];
+    NSLayoutConstraint *searchBarLeft = [NSLayoutConstraint constraintWithItem:self.searchAndFilterBar
+                                                                     attribute:NSLayoutAttributeLeft
+                                                                     relatedBy:NSLayoutRelationEqual
+                                                                        toItem:self.searchBarAndCancelButtonView
+                                                                     attribute:NSLayoutAttributeLeft
+                                                                    multiplier:1
+                                                                      constant:0];
+    self.searchBarRight = [NSLayoutConstraint constraintWithItem:self.searchAndFilterBar
+                                                                     attribute:NSLayoutAttributeRight
+                                                                     relatedBy:NSLayoutRelationEqual
+                                                                        toItem:self.searchBarAndCancelButtonView
+                                                                     attribute:NSLayoutAttributeRight
+                                                                    multiplier:1
+                                                                      constant:0];
+    
+    [self.cancelSearchButton removeConstraints:self.cancelSearchButton.constraints];
+    NSArray *cancelButtonLeftConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"[_cancelSearchButton]-(4)-|"
+                                                                                   options:0
+                                                                                   metrics:nil
+                                                                                     views:self.views];
+    
+    NSArray *cancelButtonVerticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_cancelSearchButton]|"
+                                                                                       options:0
+                                                                                       metrics:nil
+                                                                                         views:self.views];
+    
+    NSArray *searchBarVertical = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_searchAndFilterBar]"
+                                                                         options:0
+                                                                         metrics:nil
+                                                                           views:self.views];
+    [self.view addConstraints:@[searchBarLeft, self.searchBarRight]];
+    [self.view addConstraints:@[searchBarLeft, self.searchBarRight]];
+    [self.view addConstraints:cancelButtonLeftConstraints];
+    [self.view addConstraints:cancelButtonVerticalConstraints];
+    [self.searchBarAndCancelButtonView addConstraints:searchBarVertical];
+}
+
+-(void)menuConstraints
+{
+    NSLayoutConstraint *menuViewHeightConstraint = [NSLayoutConstraint constraintWithItem:self.menuView
+                                                                                attribute:NSLayoutAttributeHeight
+                                                                                relatedBy:NSLayoutRelationEqual
+                                                                                   toItem:self.view
+                                                                                attribute:NSLayoutAttributeHeight
+                                                                               multiplier:1
+                                                                                 constant:0];
+    NSLayoutConstraint *menuViewWidthConstraint = [NSLayoutConstraint constraintWithItem:self.menuView
+                                                                               attribute:NSLayoutAttributeWidth
+                                                                               relatedBy:NSLayoutRelationEqual
+                                                                                  toItem:self.view
+                                                                               attribute:NSLayoutAttributeWidth
+                                                                              multiplier:1
+                                                                                constant:0];
+    
+    NSLayoutConstraint *menuViewCenterConstraint = [NSLayoutConstraint constraintWithItem:self.menuView
+                                                                                attribute:NSLayoutAttributeCenterX
+                                                                                relatedBy:NSLayoutRelationEqual
+                                                                                   toItem:self.view
+                                                                                attribute:NSLayoutAttributeCenterX
+                                                                               multiplier:1
+                                                                                 constant:0];
+    
+    NSLayoutConstraint *menuViewBottomConstraint = [NSLayoutConstraint constraintWithItem:self.menuView
+                                                                                attribute:NSLayoutAttributeBottom
+                                                                                relatedBy:NSLayoutRelationEqual
+                                                                                   toItem:self.view
+                                                                                attribute:NSLayoutAttributeTop
+                                                                               multiplier:1
+                                                                                 constant:self.menuTabLength];
+    [self.view addConstraints:@[menuViewHeightConstraint, menuViewCenterConstraint, menuViewWidthConstraint, menuViewBottomConstraint]];
+}
+
+- (void)postViewConstraints
+{
+    [self.makePostControllerContainer removeConstraints:self.makePostControllerContainer.constraints];
+    NSLayoutConstraint *postScreenCenterX = [NSLayoutConstraint constraintWithItem:self.makePostControllerContainer
+                                                                     attribute:NSLayoutAttributeCenterX
+                                                                     relatedBy:NSLayoutRelationEqual
+                                                                        toItem:self.view
+                                                                     attribute:NSLayoutAttributeCenterX
+                                                                    multiplier:1
+                                                                    constant:0];
+    
+    self.postScreenY = [NSLayoutConstraint constraintWithItem:self.makePostControllerContainer
+                                                                         attribute:NSLayoutAttributeCenterY
+                                                                         relatedBy:NSLayoutRelationEqual
+                                                                            toItem:self.view
+                                                                         attribute:NSLayoutAttributeCenterY
+                                                                        multiplier:1
+                                                                          constant:-80];
+
+    self.postScreenHeight = [NSLayoutConstraint constraintWithItem:self.makePostControllerContainer
+                                                                        attribute:NSLayoutAttributeHeight
+                                                                        relatedBy:NSLayoutRelationEqual
+                                                                           toItem:self.view
+                                                                        attribute:NSLayoutAttributeHeight
+                                                                       multiplier:0.4
+                                                                         constant:0];
+    
+    self.postScreenWidth = [NSLayoutConstraint constraintWithItem:self.makePostControllerContainer
+                                                                        attribute:NSLayoutAttributeWidth
+                                                                        relatedBy:NSLayoutRelationEqual
+                                                                           toItem:self.view
+                                                                        attribute:NSLayoutAttributeWidth
+                                                                       multiplier:0.9
+                                                                         constant:0];
+    [self.view addConstraints:@[self.postScreenY, self.postScreenHeight,postScreenCenterX, self.postScreenWidth]];
+}
+
 
 @end

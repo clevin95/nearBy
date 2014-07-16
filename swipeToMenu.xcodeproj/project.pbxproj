@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6F1447AA196C813C00E67E60 /* CELProfilePictureView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F1447A9196C813C00E67E60 /* CELProfilePictureView.m */; };
+		6F1447AD196CC7A200E67E60 /* CELMakePostViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F1447AC196CC7A200E67E60 /* CELMakePostViewController.m */; };
 		6F2850491966F50F00356705 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F2850481966F50F00356705 /* MapKit.framework */; };
 		6F28504C1967031100356705 /* CELMenuView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F28504B1967031100356705 /* CELMenuView.m */; };
 		6F4D35E2196621A300984141 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F4D35E1196621A300984141 /* Foundation.framework */; };
@@ -24,8 +25,17 @@
 		6F4D360B196621A300984141 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6F4D3609196621A300984141 /* InfoPlist.strings */; };
 		6F4D360D196621A300984141 /* swipeToMenuTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F4D360C196621A300984141 /* swipeToMenuTests.m */; };
 		6F4D361E196623CF00984141 /* CELSwipeMenuViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F4D361C196623CF00984141 /* CELSwipeMenuViewController.m */; };
+		6F5E4F391974B1A000A13E7C /* CELCloudDataStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F5E4F381974B1A000A13E7C /* CELCloudDataStore.m */; };
+		6F84F90B196DADAA0084F6E0 /* CELSearchBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F84F90A196DADAA0084F6E0 /* CELSearchBarView.m */; };
+		6F84F90E196E322C0084F6E0 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 6F84F90C196E322C0084F6E0 /* Model.xcdatamodeld */; };
+		6F84F95E196EF1BC0084F6E0 /* CELCoreDataStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F84F95D196EF1BC0084F6E0 /* CELCoreDataStore.m */; };
+		6F84F968196EF3170084F6E0 /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F84F967196EF3170084F6E0 /* User.m */; };
 		6F9152CC1967855600F913D5 /* defaultImage.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 6F9152CB1967855600F913D5 /* defaultImage.jpg */; };
 		6F9152CE1967868800F913D5 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F9152CD1967868800F913D5 /* CoreLocation.framework */; };
+		6F9313D3196F6F9600522F05 /* CELPostMapAnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F9313D2196F6F9600522F05 /* CELPostMapAnotation.m */; };
+		6F9313D6196F788500522F05 /* CELFetchUpdates.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F9313D5196F788500522F05 /* CELFetchUpdates.m */; };
+		6F9313DA196F848700522F05 /* Post.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F9313D9196F848700522F05 /* Post.m */; };
+		6F9313DD196F848800522F05 /* Tag.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F9313DC196F848800522F05 /* Tag.m */; };
 		B5E3406A5DD7465ABCB12C75 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 99F22C9361AE4A6BB1C2915D /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -42,6 +52,8 @@
 /* Begin PBXFileReference section */
 		6F1447A8196C813C00E67E60 /* CELProfilePictureView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CELProfilePictureView.h; sourceTree = "<group>"; };
 		6F1447A9196C813C00E67E60 /* CELProfilePictureView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CELProfilePictureView.m; sourceTree = "<group>"; };
+		6F1447AB196CC7A200E67E60 /* CELMakePostViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CELMakePostViewController.h; sourceTree = "<group>"; };
+		6F1447AC196CC7A200E67E60 /* CELMakePostViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CELMakePostViewController.m; sourceTree = "<group>"; };
 		6F2850481966F50F00356705 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		6F28504A1967031100356705 /* CELMenuView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CELMenuView.h; sourceTree = "<group>"; };
 		6F28504B1967031100356705 /* CELMenuView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CELMenuView.m; sourceTree = "<group>"; };
@@ -64,8 +76,28 @@
 		6F4D360C196621A300984141 /* swipeToMenuTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = swipeToMenuTests.m; sourceTree = "<group>"; };
 		6F4D361B196623CF00984141 /* CELSwipeMenuViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CELSwipeMenuViewController.h; sourceTree = "<group>"; };
 		6F4D361C196623CF00984141 /* CELSwipeMenuViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CELSwipeMenuViewController.m; sourceTree = "<group>"; };
+		6F5E4F371974B1A000A13E7C /* CELCloudDataStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CELCloudDataStore.h; sourceTree = "<group>"; };
+		6F5E4F381974B1A000A13E7C /* CELCloudDataStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CELCloudDataStore.m; sourceTree = "<group>"; };
+		6F84F909196DADAA0084F6E0 /* CELSearchBarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CELSearchBarView.h; sourceTree = "<group>"; };
+		6F84F90A196DADAA0084F6E0 /* CELSearchBarView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CELSearchBarView.m; sourceTree = "<group>"; };
+		6F84F90D196E322C0084F6E0 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		6F84F95C196EF1BC0084F6E0 /* CELCoreDataStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CELCoreDataStore.h; sourceTree = "<group>"; };
+		6F84F95D196EF1BC0084F6E0 /* CELCoreDataStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CELCoreDataStore.m; sourceTree = "<group>"; };
+		6F84F966196EF3170084F6E0 /* User.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = User.h; sourceTree = "<group>"; };
+		6F84F967196EF3170084F6E0 /* User.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = User.m; sourceTree = "<group>"; };
 		6F9152CB1967855600F913D5 /* defaultImage.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = defaultImage.jpg; sourceTree = "<group>"; };
 		6F9152CD1967868800F913D5 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		6F9313D1196F6F9600522F05 /* CELPostMapAnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CELPostMapAnotation.h; sourceTree = "<group>"; };
+		6F9313D2196F6F9600522F05 /* CELPostMapAnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CELPostMapAnotation.m; sourceTree = "<group>"; };
+		6F9313D4196F788500522F05 /* CELFetchUpdates.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CELFetchUpdates.h; sourceTree = "<group>"; };
+		6F9313D5196F788500522F05 /* CELFetchUpdates.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CELFetchUpdates.m; sourceTree = "<group>"; };
+		6F9313D7196F7E9600522F05 /* CELFetchUpdatesProtocal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CELFetchUpdatesProtocal.h; sourceTree = "<group>"; };
+		6F9313D8196F848700522F05 /* Post.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Post.h; sourceTree = "<group>"; };
+		6F9313D9196F848700522F05 /* Post.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Post.m; sourceTree = "<group>"; };
+		6F9313DB196F848800522F05 /* Tag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tag.h; sourceTree = "<group>"; };
+		6F9313DC196F848800522F05 /* Tag.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Tag.m; sourceTree = "<group>"; };
+		6FCC6A6F196CEA5100DD4CEB /* CELMenuProtocal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CELMenuProtocal.h; sourceTree = "<group>"; };
+		6FCC6A71196D674200DD4CEB /* CELMakePostProtocal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CELMakePostProtocal.h; sourceTree = "<group>"; };
 		99F22C9361AE4A6BB1C2915D /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		FC598017900C4989BB603879 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -97,6 +129,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6F1447EF196CDED500E67E60 /* views */ = {
+			isa = PBXGroup;
+			children = (
+				6F84F909196DADAA0084F6E0 /* CELSearchBarView.h */,
+				6F84F90A196DADAA0084F6E0 /* CELSearchBarView.m */,
+				6F1447A8196C813C00E67E60 /* CELProfilePictureView.h */,
+				6F1447A9196C813C00E67E60 /* CELProfilePictureView.m */,
+				6F28504A1967031100356705 /* CELMenuView.h */,
+				6F28504B1967031100356705 /* CELMenuView.m */,
+				6FCC6A6F196CEA5100DD4CEB /* CELMenuProtocal.h */,
+			);
+			name = views;
+			sourceTree = "<group>";
+		};
 		6F4D35D5196621A300984141 = {
 			isa = PBXGroup;
 			children = (
@@ -137,13 +183,10 @@
 				6FDEDED81969D95300818EF8 /* iPad */,
 				6F4D35F0196621A300984141 /* CELAppDelegate.h */,
 				6F4D35F1196621A300984141 /* CELAppDelegate.m */,
-				6F4D361B196623CF00984141 /* CELSwipeMenuViewController.h */,
-				6F4D361C196623CF00984141 /* CELSwipeMenuViewController.m */,
 				6F4D35F3196621A300984141 /* Main.storyboard */,
-				6F1447A8196C813C00E67E60 /* CELProfilePictureView.h */,
-				6F1447A9196C813C00E67E60 /* CELProfilePictureView.m */,
-				6F28504A1967031100356705 /* CELMenuView.h */,
-				6F28504B1967031100356705 /* CELMenuView.m */,
+				6F84F962196EF1FE0084F6E0 /* model */,
+				6FCC6A70196D66D900DD4CEB /* controllers */,
+				6F1447EF196CDED500E67E60 /* views */,
 				6F4D35F9196621A300984141 /* Images.xcassets */,
 				6F4D35E8196621A300984141 /* Supporting Files */,
 			);
@@ -178,6 +221,41 @@
 				6F4D3609196621A300984141 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		6F84F962196EF1FE0084F6E0 /* model */ = {
+			isa = PBXGroup;
+			children = (
+				6F84F90C196E322C0084F6E0 /* Model.xcdatamodeld */,
+				6F9313DB196F848800522F05 /* Tag.h */,
+				6F9313DC196F848800522F05 /* Tag.m */,
+				6F9313D8196F848700522F05 /* Post.h */,
+				6F9313D9196F848700522F05 /* Post.m */,
+				6F84F966196EF3170084F6E0 /* User.h */,
+				6F84F967196EF3170084F6E0 /* User.m */,
+				6F84F95C196EF1BC0084F6E0 /* CELCoreDataStore.h */,
+				6F84F95D196EF1BC0084F6E0 /* CELCoreDataStore.m */,
+				6F5E4F371974B1A000A13E7C /* CELCloudDataStore.h */,
+				6F5E4F381974B1A000A13E7C /* CELCloudDataStore.m */,
+				6F9313D1196F6F9600522F05 /* CELPostMapAnotation.h */,
+				6F9313D2196F6F9600522F05 /* CELPostMapAnotation.m */,
+				6F9313D4196F788500522F05 /* CELFetchUpdates.h */,
+				6F9313D5196F788500522F05 /* CELFetchUpdates.m */,
+				6F9313D7196F7E9600522F05 /* CELFetchUpdatesProtocal.h */,
+			);
+			name = model;
+			sourceTree = "<group>";
+		};
+		6FCC6A70196D66D900DD4CEB /* controllers */ = {
+			isa = PBXGroup;
+			children = (
+				6F4D361B196623CF00984141 /* CELSwipeMenuViewController.h */,
+				6F4D361C196623CF00984141 /* CELSwipeMenuViewController.m */,
+				6F1447AB196CC7A200E67E60 /* CELMakePostViewController.h */,
+				6F1447AC196CC7A200E67E60 /* CELMakePostViewController.m */,
+				6FCC6A71196D674200DD4CEB /* CELMakePostProtocal.h */,
+			);
+			name = controllers;
 			sourceTree = "<group>";
 		};
 		6FDEDED81969D95300818EF8 /* iPad */ = {
@@ -321,11 +399,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6F5E4F391974B1A000A13E7C /* CELCloudDataStore.m in Sources */,
 				6F28504C1967031100356705 /* CELMenuView.m in Sources */,
+				6F9313D6196F788500522F05 /* CELFetchUpdates.m in Sources */,
 				6F1447AA196C813C00E67E60 /* CELProfilePictureView.m in Sources */,
 				6F4D35EE196621A300984141 /* main.m in Sources */,
+				6F84F90E196E322C0084F6E0 /* Model.xcdatamodeld in Sources */,
+				6F1447AD196CC7A200E67E60 /* CELMakePostViewController.m in Sources */,
 				6F4D35F2196621A300984141 /* CELAppDelegate.m in Sources */,
+				6F84F95E196EF1BC0084F6E0 /* CELCoreDataStore.m in Sources */,
+				6F9313DD196F848800522F05 /* Tag.m in Sources */,
+				6F84F968196EF3170084F6E0 /* User.m in Sources */,
 				6F4D361E196623CF00984141 /* CELSwipeMenuViewController.m in Sources */,
+				6F9313D3196F6F9600522F05 /* CELPostMapAnotation.m in Sources */,
+				6F84F90B196DADAA0084F6E0 /* CELSearchBarView.m in Sources */,
+				6F9313DA196F848700522F05 /* Post.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -548,6 +636,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		6F84F90C196E322C0084F6E0 /* Model.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				6F84F90D196E322C0084F6E0 /* Model.xcdatamodel */,
+			);
+			currentVersion = 6F84F90D196E322C0084F6E0 /* Model.xcdatamodel */;
+			path = Model.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 6F4D35D6196621A300984141 /* Project object */;
 }
