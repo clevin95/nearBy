@@ -65,7 +65,6 @@
 @property (strong, nonatomic) NSLayoutConstraint *postScreenY;
 @property (strong, nonatomic) NSArray *searchViewHorizontal;
 @property (strong, nonatomic) NSDictionary *views;
-
 @property (strong, nonatomic) CELFetchUpdates *postFetcher;
 
 - (IBAction)transtitionToMakePost:(id)sender;
@@ -88,10 +87,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.searchAndFilterBar.delegate = self;
-    self.postFetcher = [[CELFetchUpdates alloc] initForEntityNamed:@"Post"];
-    self.postFetcher.delegate = self;
-    self.worldMap.delegate = self;
+    [self setUpPostsFetch];
+    [self assignDelegates];
     [self setUpMap];
     [self setUpMakePostView];
     [self setUpMenu];
@@ -99,7 +96,23 @@
     [self setUpConstraints];
 }
 
--(void)fetchedNewObject:(id)object
+- (void)assignDelegates
+{
+    self.searchAndFilterBar.delegate = self;
+    self.postFetcher.delegate = self;
+    self.worldMap.delegate = self;
+}
+
+- (void)setUpPostsFetch
+{
+    self.postFetcher = [[CELFetchUpdates alloc] initForEntityNamed:@"Post"];
+    
+    
+    
+    [CELCoreDataStore loadAllPosts];
+}
+
+- (void)fetchedNewObject:(id)object
 {
     Post *newPost = (Post *)object;
     [self makeAnotationFromPost:newPost];
@@ -149,16 +162,11 @@
         UITextView *postText = [[UITextView alloc]initWithFrame:viewPostView.frame];
         postText.text = selectedPost.text;
         postText.editable = NO;
-        postText.textColor = [UIColor whiteColor];
+        postText.textColor = [UIColor blackColor];
         [viewPostView addSubview:postText];
         [self presentSemiView:viewPostView];
     }
 }
-
-
-
-
-
 
 
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
@@ -304,7 +312,7 @@
     self.makePostViewController.latitude = currentLatitude;
     self.makePostViewController.longitude = currentLongitude;
     MKCoordinateSpan span = {.latitudeDelta =  0.002, .longitudeDelta =  0.002};
-    CLLocationCoordinate2D coordinate = {currentLatitude + 0.0004,currentLongitude};
+    CLLocationCoordinate2D coordinate = {currentLatitude - 0.00026,currentLongitude};
     MKCoordinateRegion region = {coordinate, span};
     [self.worldMap setRegion:region animated:YES];
 }

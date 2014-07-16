@@ -17,7 +17,6 @@
     self = [super init];
     if (self) {
         [self setUpFetchForEntityName:entityName];
-        [CELCloudDataStore getAllPosts];
     }
     return self;
 }

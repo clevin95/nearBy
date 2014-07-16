@@ -43,8 +43,6 @@
 {
     MKAnnotationView *annotationView = [[MKAnnotationView alloc]initWithAnnotation:self reuseIdentifier:@"CELPostMapAnotation"];
     annotationView.layer.backgroundColor = [UIColor redColor].CGColor;
-
-
     annotationView.clipsToBounds = YES;
     annotationView.enabled = YES;
     annotationView.layer.backgroundColor = [UIColor redColor].CGColor;

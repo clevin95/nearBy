@@ -36,6 +36,7 @@
 		6F9313D6196F788500522F05 /* CELFetchUpdates.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F9313D5196F788500522F05 /* CELFetchUpdates.m */; };
 		6F9313DA196F848700522F05 /* Post.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F9313D9196F848700522F05 /* Post.m */; };
 		6F9313DD196F848800522F05 /* Tag.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F9313DC196F848800522F05 /* Tag.m */; };
+		6F98AB151976F271003C57D7 /* CELConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F98AB141976F271003C57D7 /* CELConstants.m */; };
 		B5E3406A5DD7465ABCB12C75 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 99F22C9361AE4A6BB1C2915D /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -96,6 +97,8 @@
 		6F9313D9196F848700522F05 /* Post.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Post.m; sourceTree = "<group>"; };
 		6F9313DB196F848800522F05 /* Tag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tag.h; sourceTree = "<group>"; };
 		6F9313DC196F848800522F05 /* Tag.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Tag.m; sourceTree = "<group>"; };
+		6F98AB131976F271003C57D7 /* CELConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CELConstants.h; sourceTree = "<group>"; };
+		6F98AB141976F271003C57D7 /* CELConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CELConstants.m; sourceTree = "<group>"; };
 		6FCC6A6F196CEA5100DD4CEB /* CELMenuProtocal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CELMenuProtocal.h; sourceTree = "<group>"; };
 		6FCC6A71196D674200DD4CEB /* CELMakePostProtocal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CELMakePostProtocal.h; sourceTree = "<group>"; };
 		99F22C9361AE4A6BB1C2915D /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -196,6 +199,8 @@
 		6F4D35E8196621A300984141 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				6F98AB131976F271003C57D7 /* CELConstants.h */,
+				6F98AB141976F271003C57D7 /* CELConstants.m */,
 				6F9152CB1967855600F913D5 /* defaultImage.jpg */,
 				6F4D35E9196621A300984141 /* swipeToMenu-Info.plist */,
 				6F4D35EA196621A300984141 /* InfoPlist.strings */,
@@ -409,6 +414,7 @@
 				6F4D35F2196621A300984141 /* CELAppDelegate.m in Sources */,
 				6F84F95E196EF1BC0084F6E0 /* CELCoreDataStore.m in Sources */,
 				6F9313DD196F848800522F05 /* Tag.m in Sources */,
+				6F98AB151976F271003C57D7 /* CELConstants.m in Sources */,
 				6F84F968196EF3170084F6E0 /* User.m in Sources */,
 				6F4D361E196623CF00984141 /* CELSwipeMenuViewController.m in Sources */,
 				6F9313D3196F6F9600522F05 /* CELPostMapAnotation.m in Sources */,

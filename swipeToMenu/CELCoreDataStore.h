@@ -21,6 +21,6 @@
                 latitude:(CGFloat)latitdue
                longitude:(CGFloat)longitude;
 - (void)savePostWithDictionary:(NSDictionary *)postDictionary;
-
++ (void)loadAllPosts;
 
 @end

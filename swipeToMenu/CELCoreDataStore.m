@@ -31,15 +31,10 @@
     }
     NSURL *storeURL = [[self applicationDocumentsDirectory] URLByAppendingPathComponent:@"swipeToMenu.sqlite"];
     NSError *error = nil;
-    
     NSBundle *bundle = [NSBundle bundleForClass:NSClassFromString(@"swipeToMenu")];
-    
     NSString *path = [bundle pathForResource:@"Model" ofType:@"momd"];
     NSURL *momdURL = [NSURL fileURLWithPath:path];
-    
     NSManagedObjectModel *managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:momdURL];
-    
-    
     NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:managedObjectModel];
     [coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:nil error:&error];
     if (coordinator != nil) {
@@ -71,14 +66,37 @@
     [CELCloudDataStore savePostToCloud:newPost];
 }
 
++ (void)loadAllPosts
+{
+    [CELCloudDataStore getAllPosts];
+}
+
 - (void)savePostWithDictionary:(NSDictionary *)postDictionary
 {
+    
     Post *newPost = [NSEntityDescription insertNewObjectForEntityForName:@"Post" inManagedObjectContext:self.context];
-    newPost.text = postDictionary[@"content"];
-    newPost.image =  postDictionary[@"image"];
-    newPost.rate = [NSNumber numberWithInteger:[postDictionary[@"rate"] integerValue]];
-    newPost.latitude = [NSNumber numberWithInteger:[postDictionary[@"longitude"] integerValue]];
-    newPost.longitude = [NSNumber numberWithInteger:[postDictionary[@"latitude"] integerValue]];
+    if (![postDictionary[@"content"] isKindOfClass:[NSNull class]]){
+        newPost.text = postDictionary[@"content"];
+    }
+    /*
+    if (![postDictionary[@"image"] isKindOfClass:[NSNull class]]){
+        newPost.image =  postDictionary[@"image"];
+    }
+     */
+    if (![postDictionary[@"rate"] isKindOfClass:[NSNull class]]){
+        newPost.rate = [NSNumber numberWithInteger:[postDictionary[@"rate"] integerValue]];
+        
+    }
+    
+    if (![postDictionary[@"longitude"] isKindOfClass:[NSNull class]]){
+        newPost.latitude = [NSNumber numberWithFloat:[postDictionary[@"latitude"] floatValue]];
+    }else{
+        NSLog(@"%@",postDictionary[@"longitude"]);
+    }
+    if (![postDictionary[@"latitude"] isKindOfClass:[NSNull class]]){
+         newPost.longitude = [NSNumber numberWithFloat:[postDictionary[@"longitude"] floatValue]];
+    }
+    NSLog(@"newLatitude: %@\n newLongitude: %@", newPost.latitude, newPost.longitude);
 }
 
 - (void)save
