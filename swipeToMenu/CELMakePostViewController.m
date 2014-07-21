@@ -54,7 +54,7 @@
     self.postTextView.layer.cornerRadius = 5;
     UIColor *parkGreenColor = [UIColor colorWithRed:(195.0/255.0) green:(217.0/255.0) blue:(180/255.0) alpha:1];
     
-    [self.cancelPostButton setTitleColor:parkGreenColor forState:UIControlStateNormal];
+    //[self.cancelPostButton setTitleColor:parkGreenColor forState:UIControlStateNormal];
 }
 
 

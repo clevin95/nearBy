@@ -2,7 +2,7 @@
 //  User.h
 //  swipeToMenu
 //
-//  Created by Carter Levin on 7/10/14.
+//  Created by Carter Levin on 7/18/14.
 //  Copyright (c) 2014 Carter Levin. All rights reserved.
 //
 
@@ -13,10 +13,12 @@
 
 @interface User : NSManagedObject
 
-@property (nonatomic, retain) NSString * name;
 @property (nonatomic, retain) NSString * homeTown;
+@property (nonatomic, retain) NSString * name;
+@property (nonatomic, retain) NSString * password;
 @property (nonatomic, retain) NSData * profilePicture;
 @property (nonatomic, retain) NSNumber * status;
+@property (nonatomic, retain) NSString * uniqueID;
 @property (nonatomic, retain) NSSet *posts;
 @end
 

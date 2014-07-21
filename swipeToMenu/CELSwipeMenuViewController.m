@@ -106,15 +106,20 @@
 - (void)setUpPostsFetch
 {
     self.postFetcher = [[CELFetchUpdates alloc] initForEntityNamed:@"Post"];
+    self.postFetcher.delegate = self;
+    CELCoreDataStore *store = [CELCoreDataStore sharedDataStore];
+    [store loadAllPosts];
+}
+
+-(void)viewWillLayoutSubviews
+{
     
-    
-    
-    [CELCoreDataStore loadAllPosts];
 }
 
 - (void)fetchedNewObject:(id)object
 {
     Post *newPost = (Post *)object;
+
     [self makeAnotationFromPost:newPost];
 }
 
@@ -490,7 +495,8 @@
 - (void)setUpConstraints
 {
     //[self.view removeConstraints:self.view.constraints];
-    self.view.translatesAutoresizingMaskIntoConstraints = NO;
+    //self.view.translatesAutoresizingMaskIntoConstraints = NO;
+    
     for (UIView *subview in self.view.subviews){
         if (subview != self.menuView){
             [subview removeConstraints:subview.constraints];

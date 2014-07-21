@@ -10,6 +10,7 @@
 
 @interface CELConstants : NSObject
 
-extern NSString *const POSTS_ACCESS_URL;
+extern NSString *const LOCAL_URL;
+extern NSString *const REMOTE_URL;
 
 @end

@@ -20,7 +20,19 @@
                     rate:(NSNumber*) rate
                 latitude:(CGFloat)latitdue
                longitude:(CGFloat)longitude;
+
 - (void)savePostWithDictionary:(NSDictionary *)postDictionary;
-+ (void)loadAllPosts;
+
+- (void)loadAllPosts;
+
+- (void)createUserWithName:(NSString *)name
+                   passWord:(NSString *)password
+                 completion:(void (^)(NSString *error))completion;
+
+- (void)validateForUserWithName:(NSString *)name
+                       password:(NSString *)password
+                  wasErrorBlock:(void (^)(NSString *error))wasErrorBlock;
+
+
 
 @end

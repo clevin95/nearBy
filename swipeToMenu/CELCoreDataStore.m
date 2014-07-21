@@ -66,9 +66,59 @@
     [CELCloudDataStore savePostToCloud:newPost];
 }
 
-+ (void)loadAllPosts
+- (void)createUserWithName:(NSString *)name
+                   passWord:(NSString *)password
+                 completion:(void (^)(NSString *error))completion;
 {
-    [CELCloudDataStore getAllPosts];
+    
+    [CELCloudDataStore createUserWithName:name password:password completionBlock:^(NSString *error, NSString *userID) {
+        
+        
+        if (error){
+            completion(error);
+        }
+        
+        User *newUser = [NSEntityDescription insertNewObjectForEntityForName:@"User" inManagedObjectContext:self.context];
+        newUser.name = name;
+        newUser.password = password;
+        newUser.uniqueID = userID;
+        self.currentUser = newUser;
+        
+        NSLog(@"%@", newUser);
+        completion(error);
+    }];
+}
+
+- (void)validateForUserWithName:(NSString *)name
+                       password:(NSString *)password
+                  wasErrorBlock:(void (^)(NSString *error))wasErrorBlock
+{
+    [CELCloudDataStore validateUserWithName:name password:password userPassback:^(NSString *error, NSDictionary *userDic) {
+        if (error){
+            NSString * errorString = [NSString stringWithFormat:@"%@",error];
+            wasErrorBlock(errorString);
+        }
+        
+        User *loginUser = [NSEntityDescription insertNewObjectForEntityForName:@"User" inManagedObjectContext:self.context];
+        loginUser.name = userDic[@"username"];
+        loginUser.password = userDic[@"password"];
+        self.currentUser = loginUser;
+        wasErrorBlock(error);
+    }];
+}
+
+
+
+
+
+
+- (void)loadAllPosts
+{
+    [CELCloudDataStore getAllPosts:^(NSArray *allPosts) {
+        for (NSDictionary *postDic in allPosts){
+            [self savePostWithDictionary:postDic];
+        }
+    }];
 }
 
 - (void)savePostWithDictionary:(NSDictionary *)postDictionary
@@ -78,16 +128,9 @@
     if (![postDictionary[@"content"] isKindOfClass:[NSNull class]]){
         newPost.text = postDictionary[@"content"];
     }
-    /*
-    if (![postDictionary[@"image"] isKindOfClass:[NSNull class]]){
-        newPost.image =  postDictionary[@"image"];
-    }
-     */
     if (![postDictionary[@"rate"] isKindOfClass:[NSNull class]]){
         newPost.rate = [NSNumber numberWithInteger:[postDictionary[@"rate"] integerValue]];
-        
     }
-    
     if (![postDictionary[@"longitude"] isKindOfClass:[NSNull class]]){
         newPost.latitude = [NSNumber numberWithFloat:[postDictionary[@"latitude"] floatValue]];
     }else{

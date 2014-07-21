@@ -10,6 +10,7 @@
 
 @implementation CELConstants
 
-NSString *const POSTS_ACCESS_URL = @"http://beingthere.herokuapp.com/posts";
+NSString *const LOCAL_URL = @"http://localhost:5050";
+NSString *const REMOTE_URL = @"http://beingthere.herokuapp.com";
 
 @end

@@ -2,7 +2,7 @@
 //  User.m
 //  swipeToMenu
 //
-//  Created by Carter Levin on 7/10/14.
+//  Created by Carter Levin on 7/18/14.
 //  Copyright (c) 2014 Carter Levin. All rights reserved.
 //
 
@@ -12,10 +12,12 @@
 
 @implementation User
 
-@dynamic name;
 @dynamic homeTown;
+@dynamic name;
+@dynamic password;
 @dynamic profilePicture;
 @dynamic status;
+@dynamic uniqueID;
 @dynamic posts;
 
 @end

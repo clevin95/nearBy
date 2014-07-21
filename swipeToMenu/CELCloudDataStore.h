@@ -11,7 +11,13 @@
 
 @interface CELCloudDataStore : NSObject <NSURLConnectionDelegate>
 
++ (void)createUserWithName:(NSString *)name
+                  password:(NSString *)password
+           completionBlock:(void (^)(NSString *error, NSString *uniqueID))callbackBlock;
++ (void)validateUserWithName:(NSString *)name
+                    password:(NSString *)password
+                userPassback:(void (^) (NSString *error, NSDictionary *userDic))userPassback;
 + (void)savePostToCloud:(Post *)newPost;
-+ (void)getAllPosts;
++ (void)getAllPosts:(void (^) (NSArray *allPosts))postsPassback;
 
 @end

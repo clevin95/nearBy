@@ -42,6 +42,7 @@
      forChangeType:(NSFetchedResultsChangeType)type
       newIndexPath:(NSIndexPath *)newIndexPath {
     [self.delegate fetchedNewObject:anObject];
+    
 }
 
 - (void)controller:(NSFetchedResultsController *)controller
